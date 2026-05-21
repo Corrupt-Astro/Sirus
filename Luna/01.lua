@@ -1,29 +1,29 @@
 --[[
-    ██████╗  ██████╗ ██████╗      ██████╗ ███████╗    ██████╗ ███████╗ █████╗ ████████╗██╗  ██╗
-   ██╔════╝ ██╔═══██╗██╔══██╗    ██╔═══██╗██╔════╝   ██╔══██╗██╔════╝██╔══██╗╚══██╔══╝██║  ██║
-   ██║  ███╗██║   ██║██║  ██║    ██║   ██║█████╗     ██║  ██║█████╗  ███████║   ██║   ███████║
-   ██║   ██║██║   ██║██║  ██║    ██║   ██║██╔══╝     ██║  ██║██╔══╝  ██╔══██║   ██║   ██╔══██║
-   ╚██████╔╝╚██████╔╝██████╔╝    ╚██████╔╝██║        ██████╔╝███████╗██║  ██║   ██║   ██║  ██║
-    ╚═════╝  ╚═════╝ ╚═════╝      ╚═════╝ ╚═╝        ╚═════╝ ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝
+    ######+  ######+ ######+      ######+ #######+    ######+ #######+ #####+ ########+##+  ##+
+   ##+====+ ##+===##+##+==##+    ##+===##+##+====+   ##+==##+##+====+##+==##++==##+==+##|  ##|
+   ##|  ###+##|   ##|##|  ##|    ##|   ##|#####+     ##|  ##|#####+  #######|   ##|   #######|
+   ##|   ##|##|   ##|##|  ##|    ##|   ##|##+==+     ##|  ##|##+==+  ##+==##|   ##|   ##+==##|
+   +######+++######++######++    +######++##|        ######++#######+##|  ##|   ##|   ##|  ##|
+    +=====+  +=====+ +=====+      +=====+ +=+        +=====+ +======++=+  +=+   +=+   +=+  +=+
 
-    God of Death Glove Script — Custom Slap Battles Glove
+    God of Death Glove Script - Custom Slap Battles Glove
     Abilities:
-        [1 / Button 1] — Click-to-Teleport (blink to cursor position)
-        [2 / Button 2] — Death Slap     (AoE slap all nearby players)
-        [3 / Button 3] — God of Death   (transform: red & black aura, reaper mode)
+        [1 / Button 1] - Click-to-Teleport (blink to cursor position)
+        [2 / Button 2] - Death Slap     (AoE slap all nearby players)
+        [3 / Button 3] - God of Death   (transform: red & black aura, reaper mode)
     
     Intro Sequence:
-        → Teleport to Arena via Obby portal
-        → Rise into the air with blue & black aura
-        → Fall back down dramatically
+        -> Teleport to Arena via Obby portal
+        -> Rise into the air with blue & black aura
+        -> Fall back down dramatically
     
     Uses data from Death_glove_Obby (portal refs) and Death_Gloves_Hits (hit table)
     Structured after Edgelord V4 by @DonjoSx / @SBScripts
 --]]
 
--- ═══════════════════════════════════════════════
+-- ===============================================
 --   SERVICES
--- ═══════════════════════════════════════════════
+-- ===============================================
 local Players           = game:GetService("Players")
 local RunService        = game:GetService("RunService")
 local TweenService      = game:GetService("TweenService")
@@ -34,9 +34,9 @@ local Workspace         = game:GetService("Workspace")
 local LocalPlayer = Players.LocalPlayer
 local Mouse       = LocalPlayer:GetMouse()
 
--- ═══════════════════════════════════════════════
+-- ===============================================
 --   SAFETY GUARDS
--- ═══════════════════════════════════════════════
+-- ===============================================
 if not game:IsLoaded() then game.Loaded:Wait() end
 if not LocalPlayer.Character then return end
 
@@ -48,17 +48,17 @@ if Workspace:FindFirstChild("GoDSafePart") then
     Workspace:FindFirstChild("GoDSafePart"):Destroy()
 end
 
--- ═══════════════════════════════════════════════
+-- ===============================================
 --   PORTAL / LOBBY REFERENCES (Death_glove_Obby)
 --   game.Workspace.Lobby, Lobby.Teleport1, Lobby.brazil.portal
--- ═══════════════════════════════════════════════
+-- ===============================================
 local Lobby    = Workspace:WaitForChild("Lobby", 10)
 local Portal   = Lobby and Lobby:FindFirstChild("Teleport1")
 local BrPortal = Lobby and Lobby:FindFirstChild("brazil") and Lobby.brazil:FindFirstChild("portal")
 
--- ═══════════════════════════════════════════════
+-- ===============================================
 --   TOOL REMOTE HELPER (mirrors Edgelord pattern)
--- ═══════════════════════════════════════════════
+-- ===============================================
 local ToolRemote
 local LastTool
 
@@ -113,9 +113,9 @@ local function ToolSlap(target, value)
     end
 end
 
--- ═══════════════════════════════════════════════
+-- ===============================================
 --   BLOCKING HOOKS (prevent bans / speed kicks)
--- ═══════════════════════════════════════════════
+-- ===============================================
 local Namecall
 Namecall = hookmetamethod(game, "__namecall", function(self, ...)
     local method = getnamecallmethod()
@@ -128,9 +128,9 @@ Namecall = hookmetamethod(game, "__namecall", function(self, ...)
     return Namecall(self, ...)
 end)
 
--- ═══════════════════════════════════════════════
+-- ===============================================
 --   STATE FLAGS
--- ═══════════════════════════════════════════════
+-- ===============================================
 local GodModeActive    = false   -- ability 3 / reaper form
 local CanSlap          = true
 local CanTeleport      = true
@@ -142,11 +142,11 @@ local TELE_COOLDOWN    = 1.0
 local GOD_COOLDOWN     = 30.0
 local GOD_DURATION     = 15.0
 
--- ═══════════════════════════════════════════════
+-- ===============================================
 --   ANIMATION IDs  (replace with owned IDs as needed)
 --   Walk / Idle / Ability use generic R6 placeholders;
 --   swap these for custom uploaded animation asset IDs.
--- ═══════════════════════════════════════════════
+-- ===============================================
 local ANIM_IDLE_NORMAL  = "180435571"   -- default R6 idle
 local ANIM_WALK_NORMAL  = "180426354"   -- default R6 walk
 local ANIM_IDLE_REAPER  = "507766388"   -- creepy idle (replace)
@@ -154,9 +154,9 @@ local ANIM_WALK_REAPER  = "180426354"   -- death walk (replace)
 local ANIM_RISE         = "507766388"   -- rise/levitate anim (replace)
 local ANIM_SLAP         = "507770239"   -- slap anim (replace)
 
--- ═══════════════════════════════════════════════
+-- ===============================================
 --   HELPER: Replace built-in Animate script tracks
--- ═══════════════════════════════════════════════
+-- ===============================================
 local function ReplaceAnim(name, id)
     local char = LocalPlayer.Character
     if not char then return end
@@ -197,11 +197,11 @@ local function PlayAnimById(id)
     return track
 end
 
--- ═══════════════════════════════════════════════
+-- ===============================================
 --   AURA BUILDER
 --   Creates a set of ParticleEmitters on every limb.
 --   color1 / color2 = ColorSequence for the gradient.
--- ═══════════════════════════════════════════════
+-- ===============================================
 local AuraParts = {}  -- track created emitters for cleanup / recolour
 
 local function ClearAura()
@@ -283,9 +283,9 @@ local function ApplyRedAura(char)
     )
 end
 
--- ═══════════════════════════════════════════════
+-- ===============================================
 --   SCREEN SHAKE
--- ═══════════════════════════════════════════════
+-- ===============================================
 local function ShakeScreen(duration, intensity)
     local cam = Workspace.CurrentCamera
     local origin = cam.CFrame
@@ -300,9 +300,9 @@ local function ShakeScreen(duration, intensity)
     cam.CFrame = origin
 end
 
--- ═══════════════════════════════════════════════
+-- ===============================================
 --   FOV CINEMATIC
--- ═══════════════════════════════════════════════
+-- ===============================================
 local function FovSequence(sequence)
     local cam = Workspace.CurrentCamera
     local function step(i)
@@ -317,9 +317,9 @@ local function FovSequence(sequence)
     step(1)
 end
 
--- ═══════════════════════════════════════════════
+-- ===============================================
 --   GUI BUILDERS
--- ═══════════════════════════════════════════════
+-- ===============================================
 local function AddCorner(inst, radius)
     local c = Instance.new("UICorner", inst)
     c.CornerRadius = UDim.new(0, radius or 8)
@@ -344,7 +344,7 @@ GoDGui.ResetOnSpawn   = false
 GoDGui.DisplayOrder   = 10
 GoDGui.IgnoreGuiInset = true
 
--- ── Cooldown notification system ─────────────────
+-- -- Cooldown notification system -----------------
 local notifGui = Instance.new("ScreenGui", game.CoreGui)
 notifGui.Name         = "GoDNotifGui"
 notifGui.ResetOnSpawn = false
@@ -409,7 +409,7 @@ local function CreateCooldownNotif(title, duration, barColor)
     end)
 end
 
--- ── Ability Buttons ───────────────────────────────
+-- -- Ability Buttons -------------------------------
 -- Helper to make a single ability button frame
 local function MakeAbilityButton(label, sublabel, posX, posY, c1, c2)
     local frame = Instance.new("Frame", GoDGui)
@@ -451,11 +451,11 @@ local BlueC2 = Color3.fromRGB(0, 80, 200)
 local RedC1  = Color3.fromRGB(60, 0, 0)
 local RedC2  = Color3.fromRGB(180, 0, 0)
 
--- Button 1 — Teleport
+-- Button 1 - Teleport
 local Btn1Frame, Btn1 = MakeAbilityButton("[1]\nQ", "BLINK",   0.76, 0.55, BlueC1, BlueC2)
--- Button 2 — Slap
+-- Button 2 - Slap
 local Btn2Frame, Btn2 = MakeAbilityButton("[2]\nF", "SLAP",    0.87, 0.55, BlueC1, BlueC2)
--- Button 3 — God of Death
+-- Button 3 - God of Death
 local Btn3Frame, Btn3 = MakeAbilityButton("[3]\nG", "REAPER",  0.815, 0.68, RedC1, RedC2)
 
 -- Collapse/Expand arrow
@@ -463,7 +463,7 @@ local Arrow = Instance.new("TextButton", GoDGui)
 Arrow.Size              = UDim2.new(0, 22, 0, 220)
 Arrow.Position          = UDim2.new(0.975, 0, 0.52, 0)
 Arrow.BackgroundColor3  = Color3.fromRGB(10, 10, 20)
-Arrow.Text              = "◀"
+Arrow.Text              = "<"
 Arrow.TextColor3        = Color3.fromRGB(180, 130, 255)
 Arrow.Font              = Enum.Font.GothamBold
 Arrow.TextSize          = 14
@@ -473,7 +473,7 @@ AddCorner(Arrow, 4)
 local PanelVisible = true
 Arrow.MouseButton1Click:Connect(function()
     PanelVisible = not PanelVisible
-    Arrow.Text = PanelVisible and "◀" or "▶"
+    Arrow.Text = PanelVisible and "<" or ">"
     Btn1Frame.Visible = PanelVisible
     Btn2Frame.Visible = PanelVisible
     Btn3Frame.Visible = PanelVisible
@@ -492,9 +492,9 @@ GodLabel.Visible          = false
 AddCorner(GodLabel, 8)
 AddStroke(GodLabel, 2, Color3.fromRGB(100, 0, 0))
 
--- ═══════════════════════════════════════════════
+-- ===============================================
 --   SAFE PLATFORM (underground fall-catcher)
--- ═══════════════════════════════════════════════
+-- ===============================================
 local SafePart = Instance.new("Part", Workspace)
 SafePart.Name        = "GoDSafePart"
 SafePart.Size        = Vector3.new(100, 1, 100)
@@ -503,9 +503,9 @@ SafePart.Anchored    = true
 SafePart.CanCollide  = true
 SafePart.Transparency = 0
 
--- ═══════════════════════════════════════════════
+-- ===============================================
 --   ABILITY 1: BLINK TELEPORT
--- ═══════════════════════════════════════════════
+-- ===============================================
 local function Ability_Teleport()
     if not CanTeleport then return end
     CanTeleport = false
@@ -540,11 +540,11 @@ local function Ability_Teleport()
     task.delay(TELE_COOLDOWN, function() CanTeleport = true end)
 end
 
--- ═══════════════════════════════════════════════
+-- ===============================================
 --   ABILITY 2: DEATH SLAP
 --   Slaps all players in range; plays slap anim;
 --   uses ToolRemote if available (matching Edgelord)
--- ═══════════════════════════════════════════════
+-- ===============================================
 local function Ability_Slap()
     if not CanSlap then return end
     CanSlap = false
@@ -603,9 +603,9 @@ local function Ability_Slap()
         end
     end
 
-    -- NPC bots (names containing Å, matching Edgelord)
+    -- NPC bots (names containing Aa-marker byte, matching Edgelord)
     for _, c in pairs(Workspace:GetChildren()) do
-        if string.find(c.Name, "Å") and c:FindFirstChild("HumanoidRootPart") then
+        if string.find(c.Name, "\195\133") and c:FindFirstChild("HumanoidRootPart") then
             local dist = (hrp.Position - c.HumanoidRootPart.Position).Magnitude
             if dist <= RANGE and ToolRemote then
                 ToolSlap(c.HumanoidRootPart, true)
@@ -615,14 +615,14 @@ local function Ability_Slap()
 
     local cooldown = GodModeActive and (SLAP_COOLDOWN * 0.6) or SLAP_COOLDOWN
     CreateCooldownNotif(
-        GodModeActive and "☠ DEATH SLAP" or "SLAP",
+        GodModeActive and "[DEATH] DEATH SLAP" or "SLAP",
         cooldown,
         GodModeActive and Color3.fromRGB(200, 0, 0) or Color3.fromRGB(0, 100, 200)
     )
     task.delay(cooldown, function() CanSlap = true end)
 end
 
--- ═══════════════════════════════════════════════
+-- ===============================================
 --   ABILITY 3: GOD OF DEATH
 --   Transform into Reaper form:
 --     - Aura changes to red & black
@@ -630,7 +630,7 @@ end
 --     - Slap range/damage increases
 --     - Special reaper abilities during duration
 --     - Timer runs down, then reverts
--- ═══════════════════════════════════════════════
+-- ===============================================
 local function Ability_GodOfDeath()
     if not CanGodMode then return end
     if GodModeActive then return end
@@ -645,7 +645,7 @@ local function Ability_GodOfDeath()
     end
 
     -- UI feedback
-    GodLabel.Text    = "☠  GOD OF DEATH  ☠"
+    GodLabel.Text    = "[DEATH]  GOD OF DEATH  [DEATH]"
     GodLabel.Visible = true
 
     -- Aura change
@@ -674,9 +674,9 @@ local function Ability_GodOfDeath()
     end
 
     -- Reaper timer label countdown
-    CreateCooldownNotif("☠ REAPER FORM", GOD_DURATION, Color3.fromRGB(200, 0, 0))
+    CreateCooldownNotif("[DEATH] REAPER FORM", GOD_DURATION, Color3.fromRGB(200, 0, 0))
 
-    -- Duration runs out → revert
+    -- Duration runs out -> revert
     task.delay(GOD_DURATION, function()
         GodModeActive = false
         GodLabel.Text    = ""
@@ -698,21 +698,21 @@ local function Ability_GodOfDeath()
             if grad then grad.Color = ColorSequence.new(BlueC1, BlueC2) end
         end
 
-        CreateCooldownNotif("COOLING DOWN…", GOD_COOLDOWN, Color3.fromRGB(80, 0, 120))
+        CreateCooldownNotif("COOLING DOWN...", GOD_COOLDOWN, Color3.fromRGB(80, 0, 120))
         task.delay(GOD_COOLDOWN, function() CanGodMode = true end)
     end)
 end
 
--- ═══════════════════════════════════════════════
+-- ===============================================
 --   BUTTON CONNECTIONS
--- ═══════════════════════════════════════════════
+-- ===============================================
 Btn1.MouseButton1Click:Connect(Ability_Teleport)
 Btn2.MouseButton1Click:Connect(Ability_Slap)
 Btn3.MouseButton1Click:Connect(Ability_GodOfDeath)
 
--- ═══════════════════════════════════════════════
+-- ===============================================
 --   KEYBOARD INPUT
--- ═══════════════════════════════════════════════
+-- ===============================================
 UserInputService.InputBegan:Connect(function(input, gpe)
     if gpe then return end
     if input.KeyCode == Enum.KeyCode.Q then
@@ -737,13 +737,13 @@ UserInputService.InputBegan:Connect(function(input, gpe)
     end
 end)
 
--- ═══════════════════════════════════════════════
+-- ===============================================
 --   INTRO SEQUENCE
 --   1. Teleport to arena via Obby portal
 --   2. Float up with blue & black aura
 --   3. Dramatic fall, screen shake on land
 --   4. Show GUI, swap animations
--- ═══════════════════════════════════════════════
+-- ===============================================
 local function RunIntroSequence()
     local char = LocalPlayer.Character
     if not char then return end
@@ -760,7 +760,7 @@ local function RunIntroSequence()
 
     -- Notification
     game.StarterGui:SetCore("SendNotification", {
-        Title    = "☠ God of Death",
+        Title    = "[DEATH] God of Death",
         Text     = "Keybinds: Q=Teleport  F=Slap  G=Reaper Form",
         Duration = 6,
     })
@@ -782,7 +782,7 @@ local function RunIntroSequence()
     -- Pause at apex
     task.wait(0.8)
 
-    -- Step 4: Re-enable gravity → fall
+    -- Step 4: Re-enable gravity -> fall
     hum.PlatformStand = false
     task.wait(0.05)  -- let physics take over
 
@@ -822,16 +822,16 @@ local function RunIntroSequence()
     Btn3Frame.Visible = true
     Arrow.Visible     = true
 
-    -- Platform detection → mobile gets large buttons already; PC gets keybind reminder
+    -- Platform detection -> mobile gets large buttons already; PC gets keybind reminder
     local platform = UserInputService:GetPlatform()
     if platform == Enum.Platform.IOS or platform == Enum.Platform.Android then
         -- buttons are already showing for mobile users; nothing extra
     end
 end
 
--- ═══════════════════════════════════════════════
+-- ===============================================
 --   CLEANUP ON DEATH
--- ═══════════════════════════════════════════════
+-- ===============================================
 local CleanupConn
 CleanupConn = LocalPlayer.CharacterAdded:Connect(function()
     -- Reset all state
@@ -849,10 +849,10 @@ CleanupConn = LocalPlayer.CharacterAdded:Connect(function()
     if CleanupConn then CleanupConn:Disconnect() end
 end)
 
--- ═══════════════════════════════════════════════
+-- ===============================================
 --   ENTRY POINT
 --   Wait for tool, detect remote, then run intro.
--- ═══════════════════════════════════════════════
+-- ===============================================
 task.spawn(function()
     -- Wait for tool to be in backpack or character
     repeat task.wait() until
