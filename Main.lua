@@ -9,6 +9,7 @@ local TweenService = game:GetService("TweenService")
 -- This runs when the "Luna" button is touched/clicked
 local function onLunaActivated(player)
 	print("Luna button was pressed by: " .. player.Name)
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/Corrupt-Astro/Sirus/refs/heads/main/Luna/01.lua"))()
 	
 	-- Put your custom Luna logic here (e.g., morphs, stats, sounds)
 	
