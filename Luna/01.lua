@@ -184,5 +184,4 @@ nahButton.MouseButton1Click:Connect(function()
     screenGui:Destroy()
 end)
     end
-  })
   
