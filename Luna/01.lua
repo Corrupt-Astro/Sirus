@@ -1,16 +1,22 @@
-      local player = game.Players.LocalPlayer
+print("HI")
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local SoundService = game:GetService("SoundService")
+
+local player = Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 local rootPart = character:WaitForChild("HumanoidRootPart")
-local humanoid = character:FindFirstChildOfClass("Humanoid")
+local humanoid = character:WaitForChild("Humanoid")
 
--- GUI Setup (Start or Nah)
+-- GUI Setup
 local screenGui = Instance.new("ScreenGui")
-screenGui.Parent = game.CoreGui
+screenGui.ResetOnSpawn = false
 
 local mainFrame = Instance.new("Frame")
 mainFrame.Size = UDim2.new(0, 250, 0, 150)
 mainFrame.Position = UDim2.new(0.5, -125, 0.4, -75)
 mainFrame.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+mainFrame.Active = true
 
 -- Apply Gradient Effect
 local uiGradient = Instance.new("UIGradient")
@@ -25,20 +31,16 @@ local uiCorner = Instance.new("UICorner")
 uiCorner.CornerRadius = UDim.new(0, 15)
 uiCorner.Parent = mainFrame
 
-mainFrame.Active = true
-mainFrame.Draggable = true
-mainFrame.Parent = screenGui
-
 local title = Instance.new("TextLabel")
 title.Size = UDim2.new(1, 0, 0.3, 0)
-title.Text = "Made by @IMNOTFFBG8 - Showcased and asked to make by @Corrupt_Echo"
+title.Text = "Made by @IMNOTFFBG8 - Showcased by @Corrupt_Echo"
 title.TextColor3 = Color3.new(1, 1, 1)
 title.Font = Enum.Font.Arcade
 title.TextScaled = true
 title.BackgroundTransparency = 1
 title.Parent = mainFrame
 
--- Create Button (Fixed version with parent)
+-- Create Button Helper
 local function createButton(text, pos, parent)
     local button = Instance.new("TextButton")
     button.Size = UDim2.new(0.3, 0, 0.3, 0)
@@ -66,10 +68,14 @@ end
 local startButton = createButton("Start", UDim2.new(0.05, 0, 0.6, 0), mainFrame)
 local nahButton = createButton("Nah", UDim2.new(0.65, 0, 0.6, 0), mainFrame)
 
+-- Parent Main Frame to GUI, then GUI to PlayerGui
+mainFrame.Parent = screenGui
+screenGui.Parent = player:WaitForChild("PlayerGui") -- Changed from CoreGui
+
 local function startScript()
     screenGui:Destroy()
 
-    -- Teleport Player to a Specific CFrame Position
+    -- Teleport Player
     rootPart.CFrame = CFrame.new(0, 10, 0)
 
     -- Play Background Music
@@ -77,25 +83,27 @@ local function startScript()
     sound.SoundId = "rbxassetid://1835322563"
     sound.Volume = 5
     sound.Looped = true
-    sound.Parent = game:GetService("SoundService")
+    sound.Parent = SoundService
     sound:Play()
 
-    -- Apply Custom Animations
+    -- Apply Custom Animations safely
     local animate = character:FindFirstChild("Animate")
     if animate then
-        animate.idle.Animation1.AnimationId = "rbxassetid://16163355836"
-        animate.idle.Animation2.AnimationId = "rbxassetid://16163355836"
-        animate.walk.WalkAnim.AnimationId = "rbxassetid://16163350920"
+        pcall(function()
+            animate.idle.Animation1.AnimationId = "rbxassetid://16163355836"
+            animate.idle.Animation2.AnimationId = "rbxassetid://16163355836"
+            animate.walk.WalkAnim.AnimationId = "rbxassetid://16163350920"
+        end)
     end
 
     -- Saber Glove GUI
     local gui = Instance.new("ScreenGui")
-    gui.Parent = game.CoreGui
-
+    
     local frame = Instance.new("Frame")
     frame.Size = UDim2.new(0, 200, 0, 150)
     frame.Position = UDim2.new(0.5, -100, 0.5, -75)
     frame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    frame.Active = true
 
     local uiGradientGui = Instance.new("UIGradient")
     uiGradientGui.Color = ColorSequence.new{
@@ -108,34 +116,33 @@ local function startScript()
     uiCornerGui.CornerRadius = UDim.new(0, 15)
     uiCornerGui.Parent = frame
 
-    frame.Active = true
-    frame.Draggable = true
-    frame.Parent = gui
-
-    local title = Instance.new("TextLabel")
-    title.Size = UDim2.new(1, 0, 0.2, 0)
-    title.Text = "Saber Glove"
-    title.Font = Enum.Font.Arcade
-    title.TextScaled = true
-    title.TextColor3 = Color3.new(1, 1, 1)
-    title.BackgroundTransparency = 1
-    title.Parent = frame
+    local titleGui = Instance.new("TextLabel")
+    titleGui.Size = UDim2.new(1, 0, 0.2, 0)
+    titleGui.Text = "Saber Glove"
+    titleGui.Font = Enum.Font.Arcade
+    titleGui.TextScaled = true
+    titleGui.TextColor3 = Color3.new(1, 1, 1)
+    titleGui.BackgroundTransparency = 1
+    titleGui.Parent = frame
 
     local hitboxButton = createButton("HIT", UDim2.new(0.05, 0, 0.4, 0), frame)
     local eButton = createButton("E", UDim2.new(0.35, 0, 0.4, 0), frame)
     local rButton = createButton("R", UDim2.new(0.65, 0, 0.4, 0), frame)
 
+    frame.Parent = gui
+    gui.Parent = player:WaitForChild("PlayerGui") -- Changed from CoreGui
+
     -- HIT Toggle
     hitboxButton.MouseButton1Click:Connect(function()
-        game:GetService("ReplicatedStorage").RetroAbility:FireServer("Ban Hammer")
+        local retro = ReplicatedStorage:FindFirstChild("RetroAbility")
+        if retro then retro:FireServer("Ban Hammer") end
     end)
 
     -- E Button: Teleport to Nearest Player
     eButton.MouseButton1Click:Connect(function()
-        local players = game:GetService("Players")
         local nearestPlayer, shortestDistance = nil, math.huge
 
-        for _, plr in pairs(players:GetPlayers()) do
+        for _, plr in pairs(Players:GetPlayers()) do
             if plr ~= player and plr.Character then
                 local targetRoot = plr.Character:FindFirstChild("HumanoidRootPart")
                 if targetRoot then
@@ -156,7 +163,8 @@ local function startScript()
                     ["origin"] = rootPart.CFrame
                 }
             }
-            game:GetService("ReplicatedStorage").GeneralAbility:FireServer(unpack(args))
+            local general = ReplicatedStorage:FindFirstChild("GeneralAbility")
+            if general then general:FireServer(unpack(args)) end
         end
     end)
 
@@ -169,7 +177,8 @@ local function startScript()
                 ["origin"] = CFrame.new(-31.54, -5.17, 8.58)
             }
         }
-        game:GetService("ReplicatedStorage"):WaitForChild("GeneralAbility"):FireServer(unpack(args))
+        local general = ReplicatedStorage:FindFirstChild("GeneralAbility")
+        if general then general:FireServer(unpack(args)) end
     end)
 
     -- Reset on Death
@@ -183,5 +192,3 @@ startButton.MouseButton1Click:Connect(startScript)
 nahButton.MouseButton1Click:Connect(function()
     screenGui:Destroy()
 end)
-    end
-  
