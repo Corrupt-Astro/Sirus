@@ -1,12 +1,50 @@
-print("HI")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
+local UserInputService = game:GetService("UserInputService")
 
 local player = Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 local rootPart = character:WaitForChild("HumanoidRootPart")
 local humanoid = character:WaitForChild("Humanoid")
+
+-- Custom Dragging Function
+local function makeDraggable(frame)
+    local dragging = false
+    local dragInput, dragStart, startPos
+
+    frame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = frame.Position
+
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+
+    frame.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            local delta = input.Position - dragStart
+            frame.Position = UDim2.new(
+                startPos.X.Scale, 
+                startPos.X.Offset + delta.X, 
+                startPos.Y.Scale, 
+                startPos.Y.Offset + delta.Y
+            )
+        end
+    end)
+end
 
 -- GUI Setup
 local screenGui = Instance.new("ScreenGui")
@@ -68,9 +106,10 @@ end
 local startButton = createButton("Start", UDim2.new(0.05, 0, 0.6, 0), mainFrame)
 local nahButton = createButton("Nah", UDim2.new(0.65, 0, 0.6, 0), mainFrame)
 
--- Parent Main Frame to GUI, then GUI to PlayerGui
+-- Parent and Initialize Dragging
 mainFrame.Parent = screenGui
-screenGui.Parent = player:WaitForChild("PlayerGui") -- Changed from CoreGui
+screenGui.Parent = player:WaitForChild("PlayerGui")
+makeDraggable(mainFrame)
 
 local function startScript()
     screenGui:Destroy()
@@ -130,7 +169,8 @@ local function startScript()
     local rButton = createButton("R", UDim2.new(0.65, 0, 0.4, 0), frame)
 
     frame.Parent = gui
-    gui.Parent = player:WaitForChild("PlayerGui") -- Changed from CoreGui
+    gui.Parent = player:WaitForChild("PlayerGui")
+    makeDraggable(frame) -- Enable dragging for the second menu
 
     -- HIT Toggle
     hitboxButton.MouseButton1Click:Connect(function()
