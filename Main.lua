@@ -17,6 +17,7 @@ end
 -- This runs when the "Sirius" button is touched/clicked
 local function onSiriusActivated(player)
 	print("Sirius button was pressed by: " .. player.Name)
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/Corrupt-Astro/Sirus/refs/heads/main/Syde/01.lua"))()
 	
 	-- Put your custom Sirius logic here (e.g., morphs, stats, sounds)
 	
