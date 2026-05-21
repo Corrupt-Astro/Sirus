@@ -1,234 +1,58 @@
-local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local SoundService = game:GetService("SoundService")
-local UserInputService = game:GetService("UserInputService")
+-- Luna.lua
+local Starlight = loadstring(game:HttpGet("https://raw.nebulasoftworks.xyz/starlight"))()  
 
-local player = Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local rootPart = character:WaitForChild("HumanoidRootPart")
-local humanoid = character:WaitForChild("Humanoid")
+local NebulaIcons = loadstring(game:HttpGet("https://raw.nebulasoftworks.xyz/nebula-icon-library-loader"))()
 
--- Custom Dragging Function
-local function makeDraggable(frame)
-    local dragging = false
-    local dragInput, dragStart, startPos
+local Window = Starlight:CreateWindow({
+    Name = "Sirus",
+    Subtitle = "v0.1",
+    Icon = 123456789,
 
-    frame.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            dragging = true
-            dragStart = input.Position
-            startPos = frame.Position
+    LoadingSettings = {
+        Title = "My Script Hub",
+        Subtitle = "Welcome to My Script Hub",
+    },
 
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
-                    dragging = false
-                end
-            end)
-        end
-    end)
+    FileSettings = {
+        ConfigFolder = "MyScript"
+    },
+})
 
-    frame.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-            dragInput = input
-        end
-    end)
 
-    UserInputService.InputChanged:Connect(function(input)
-        if input == dragInput and dragging then
-            local delta = input.Position - dragStart
-            frame.Position = UDim2.new(
-                startPos.X.Scale, 
-                startPos.X.Offset + delta.X, 
-                startPos.Y.Scale, 
-                startPos.Y.Offset + delta.Y
-            )
-        end
-    end)
-end
+Window:CreateHomeTab({
+    -- Logic is done this way to not immediately rule out unknown executors.
+    -- For example, if Delta is confirmed to break with your script, it can go in Unsupported.
+    -- If users use Trigon but you don't have it/unsure whether it works, it can be left out and marked as a maybe
 
--- GUI Setup
-local screenGui = Instance.new("ScreenGui")
-screenGui.ResetOnSpawn = false
+    SupportedExecutors = {Codex, Delta, Wave}, 
+    UnsupportedExecutors = {Krnl},
 
-local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 250, 0, 150)
-mainFrame.Position = UDim2.new(0.5, -125, 0.4, -75)
-mainFrame.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-mainFrame.Active = true
+    DiscordInvite = "1234", -- The Discord Invite Link. Do Not Include discord.gg/ | Only Include the code.
+    Backdrop = nil, -- A Custom Image to use for the backdrop. Set to 0 to use the Game's Thumbnail. Defaults To A Roblox Void. Set to a blank image to not use.  
 
--- Apply Gradient Effect
-local uiGradient = Instance.new("UIGradient")
-uiGradient.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),  
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 255))   
-}
-uiGradient.Parent = mainFrame
+    IconStyle = 1, -- 1 for solid, 2 for outline
 
--- Rounded Corners
-local uiCorner = Instance.new("UICorner")
-uiCorner.CornerRadius = UDim.new(0, 15)
-uiCorner.Parent = mainFrame
-
-local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, 0, 0.3, 0)
-title.Text = "Made by @IMNOTFFBG8 - Showcased by @Corrupt_Echo"
-title.TextColor3 = Color3.new(1, 1, 1)
-title.Font = Enum.Font.Arcade
-title.TextScaled = true
-title.BackgroundTransparency = 1
-title.Parent = mainFrame
-
--- Create Button Helper
-local function createButton(text, pos, parent)
-    local button = Instance.new("TextButton")
-    button.Size = UDim2.new(0.3, 0, 0.3, 0)
-    button.Position = pos
-    button.Text = text
-    button.Font = Enum.Font.Arcade
-    button.TextScaled = true
-    button.TextColor3 = Color3.new(0, 0, 0)
-
-    local buttonGradient = Instance.new("UIGradient")
-    buttonGradient.Color = ColorSequence.new{
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),  
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 255))   
+    Changelog = {
+        -- Pass Tables For Each Update
+        
+        {
+            Title = "Creation",
+            Date = "May 20 2026",
+            Description = "The Script Was Created and Basic support Added",
+        },
+        {
+            Title = "Slap Battles",
+            Date = "Started May 21st 2026, continued May 28th-June 4th 2026",
+            Description = "Added full slap battles Support",
+        }  
     }
-    buttonGradient.Parent = button
+})
 
-    local buttonCorner = Instance.new("UICorner")
-    buttonCorner.CornerRadius = UDim.new(0, 10)
-    buttonCorner.Parent = button
 
-    button.Parent = parent
-    return button
-end
+local Tab = TabSection:CreateTab({
+    Name = "Welcome!",
+    Icon = NebulaIcons:GetIcon('view_in_ar', 'Material'),
+    Columns = 2,
+}, "INDEX")
 
-local startButton = createButton("Start", UDim2.new(0.05, 0, 0.6, 0), mainFrame)
-local nahButton = createButton("Nah", UDim2.new(0.65, 0, 0.6, 0), mainFrame)
 
--- Parent and Initialize Dragging
-mainFrame.Parent = screenGui
-screenGui.Parent = player:WaitForChild("PlayerGui")
-makeDraggable(mainFrame)
-
-local function startScript()
-    screenGui:Destroy()
-
-    -- Teleport Player
-    rootPart.CFrame = CFrame.new(0, 10, 0)
-
-    -- Play Background Music
-    local sound = Instance.new("Sound")
-    sound.SoundId = "rbxassetid://1835322563"
-    sound.Volume = 5
-    sound.Looped = true
-    sound.Parent = SoundService
-    sound:Play()
-
-    -- Apply Custom Animations safely
-    local animate = character:FindFirstChild("Animate")
-    if animate then
-        pcall(function()
-            animate.idle.Animation1.AnimationId = "rbxassetid://16163355836"
-            animate.idle.Animation2.AnimationId = "rbxassetid://16163355836"
-            animate.walk.WalkAnim.AnimationId = "rbxassetid://16163350920"
-        end)
-    end
-
-    -- Saber Glove GUI
-    local gui = Instance.new("ScreenGui")
-    
-    local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(0, 200, 0, 150)
-    frame.Position = UDim2.new(0.5, -100, 0.5, -75)
-    frame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    frame.Active = true
-
-    local uiGradientGui = Instance.new("UIGradient")
-    uiGradientGui.Color = ColorSequence.new{
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 255))
-    }
-    uiGradientGui.Parent = frame
-
-    local uiCornerGui = Instance.new("UICorner")
-    uiCornerGui.CornerRadius = UDim.new(0, 15)
-    uiCornerGui.Parent = frame
-
-    local titleGui = Instance.new("TextLabel")
-    titleGui.Size = UDim2.new(1, 0, 0.2, 0)
-    titleGui.Text = "Saber Glove"
-    titleGui.Font = Enum.Font.Arcade
-    titleGui.TextScaled = true
-    titleGui.TextColor3 = Color3.new(1, 1, 1)
-    titleGui.BackgroundTransparency = 1
-    titleGui.Parent = frame
-
-    local hitboxButton = createButton("HIT", UDim2.new(0.05, 0, 0.4, 0), frame)
-    local eButton = createButton("E", UDim2.new(0.35, 0, 0.4, 0), frame)
-    local rButton = createButton("R", UDim2.new(0.65, 0, 0.4, 0), frame)
-
-    frame.Parent = gui
-    gui.Parent = player:WaitForChild("PlayerGui")
-    makeDraggable(frame) -- Enable dragging for the second menu
-
-    -- HIT Toggle
-    hitboxButton.MouseButton1Click:Connect(function()
-        local retro = ReplicatedStorage:FindFirstChild("RetroAbility")
-        if retro then retro:FireServer("Ban Hammer") end
-    end)
-
-    -- E Button: Teleport to Nearest Player
-    eButton.MouseButton1Click:Connect(function()
-        local nearestPlayer, shortestDistance = nil, math.huge
-
-        for _, plr in pairs(Players:GetPlayers()) do
-            if plr ~= player and plr.Character then
-                local targetRoot = plr.Character:FindFirstChild("HumanoidRootPart")
-                if targetRoot then
-                    local distance = (rootPart.Position - targetRoot.Position).Magnitude
-                    if distance < shortestDistance then
-                        shortestDistance = distance
-                        nearestPlayer = targetRoot
-                    end
-                end
-            end
-        end
-
-        if nearestPlayer then
-            local args = {
-                [1] = "default",
-                [2] = {
-                    ["goal"] = nearestPlayer.CFrame,
-                    ["origin"] = rootPart.CFrame
-                }
-            }
-            local general = ReplicatedStorage:FindFirstChild("GeneralAbility")
-            if general then general:FireServer(unpack(args)) end
-        end
-    end)
-
-    -- R Button: Activate Ultimate
-    rButton.MouseButton1Click:Connect(function()
-        local args = {
-            [1] = "ultimate",
-            [2] = {
-                ["goal"] = CFrame.new(-96.98, -5.17, -37.43),
-                ["origin"] = CFrame.new(-31.54, -5.17, 8.58)
-            }
-        }
-        local general = ReplicatedStorage:FindFirstChild("GeneralAbility")
-        if general then general:FireServer(unpack(args)) end
-    end)
-
-    -- Reset on Death
-    humanoid.Died:Connect(function()
-        gui:Destroy()
-        sound:Destroy()
-    end)
-end
-
-startButton.MouseButton1Click:Connect(startScript)
-nahButton.MouseButton1Click:Connect(function()
-    screenGui:Destroy()
-end)
