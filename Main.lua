@@ -9,18 +9,18 @@ local TweenService = game:GetService("TweenService")
 -- This runs when the "Luna" button is touched/clicked
 local function onLunaActivated(player)
 	print("Luna button was pressed by: " .. player.Name)
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/Corrupt-Astro/Sirus/refs/heads/main/Luna/01.lua"))()
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/Corrupt-Astro/Sirus/refs/heads/main/Luna/01.lua"))()
 	
-	-- Put your custom Luna logic here (e.g., morphs, stats, sounds)
+	-- Put your custom Luna logic here
 	
 end
 
 -- This runs when the "Sirius" button is touched/clicked
 local function onSiriusActivated(player)
 	print("Sirius button was pressed by: " .. player.Name)
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/Corrupt-Astro/Sirus/refs/heads/main/Syde/01.lua"))()
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/Corrupt-Astro/Sirus/refs/heads/main/Syde/01.lua"))()
 	
-	-- Put your custom Sirius logic here (e.g., morphs, stats, sounds)
+	-- Put your custom Sirius logic here
 	
 end
 
@@ -53,6 +53,22 @@ centerFrame.BackgroundTransparency = 1
 listLayout.Parent = centerFrame
 centerFrame.Parent = screenGui
 
+-- Table to keep track of both buttons for the mass fade-out
+local buttons = {}
+
+-- Function to handle fading out and destroying the whole menu
+local function disappearWholeUI()
+	-- Loop through both buttons and animate them simultaneously
+	for _, button in ipairs(buttons) do
+		local fadeTween = TweenService:Create(button, TweenInfo.new(0.3), {BackgroundTransparency = 1, TextTransparency = 1})
+		fadeTween:Play()
+	end
+	
+	-- Wait for the 0.3-second animation to finish, then delete the whole ScreenGui
+	task.wait(0.3)
+	screenGui:Destroy()
+end
+
 -- Helper function to stylize and handle button behavior
 local function createButton(name, text, color, customFunction)
 	local button = Instance.new("TextButton")
@@ -78,14 +94,8 @@ local function createButton(name, text, color, customFunction)
 			warn("Error running button function: " .. tostring(err))
 		end
 		
-		-- 2. Smoothly fade out the button
-		local fadeTween = TweenService:Create(button, TweenInfo.new(0.3), {BackgroundTransparency = 1, TextTransparency = 1})
-		fadeTween:Play()
-		
-		-- 3. Destroy the button instance after the animation finishes
-		fadeTween.Completed:Connect(function()
-			button:Destroy()
-		end)
+		-- 2. Make the entire UI disappear
+		disappearWholeUI()
 	end)
 
 	return button
@@ -93,7 +103,11 @@ end
 
 -- Generate the "Luna" and "Sirius" buttons and link their functions
 local lunaButton = createButton("LunaButton", "Luna", Color3.fromRGB(142, 68, 173), onLunaActivated)
-local siriusButton = createButton("SiriusButton", "Sirius", Color3.fromRGB(41, 128, 185), onSiriusActivated)
+local siriusButton = createButton("SiriusButton", "Syde", Color3.fromRGB(41, 128, 185), onSiriusActivated)
+
+-- Store buttons in our table so the disappear function can find them both
+table.insert(buttons, lunaButton)
+table.insert(buttons, siriusButton)
 
 -- Parent them to the centered frame
 lunaButton.Parent = centerFrame
