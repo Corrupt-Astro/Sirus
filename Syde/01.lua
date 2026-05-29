@@ -1,3 +1,4 @@
+print("hi")
 local syde = loadstring(game:HttpGet("https://raw.githubusercontent.com/essencejs/syde/refs/heads/main/source",true))()
 syde:Load({
 	Logo = '7488932274',
