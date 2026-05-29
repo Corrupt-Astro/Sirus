@@ -302,6 +302,7 @@ SLAPTab1:Button({
 	       game.Workspace.Retro.Parent = game.ReplicatedStorage.Assets
 	end,
 })
+end
 
 if game.placeId == 6403373529 then
     local SLAPTab2 = Window:InitTab({
@@ -464,7 +465,8 @@ SLAPTab2:Button({
 		game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = workspace["Bed"].Bed3.CFrame * CFrame.new(0,0,-1)
 
 	end,
-})SLAPTab2:Button({
+})
+SLAPTab2:Button({
 	Title = 'House', -- Set Title
 	Description = '', -- Description (Optional)
 	Type = 'Default', -- Type [ Default, Hold ] (Optional)
@@ -478,5 +480,6 @@ SLAPTab2:Button({
 	-- Types Coming Very Soon ex. { Options }
 })
 	end,
-})
+
+end
 
